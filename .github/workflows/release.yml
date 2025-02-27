@@ -1,9 +1,25 @@
-name: 'Dev Release'
+name: Release "create-stencil"
 
 on:
   workflow_dispatch:
-  # Make this a reusable workflow, no value needed
-  # https://docs.github.com/en/actions/using-workflows/reusing-workflows
+    inputs:
+      releaseType:
+        description: "Release type - major, minor or patch"
+        required: true
+        type: choice
+        default: "patch"
+        options:
+          - patch
+          - minor
+          - major
+      devRelease:
+        description: Set to "yes" to release a dev build
+        required: true
+        type: choice
+        default: "no"
+        options:
+          - "yes"
+          - "no"
 
 jobs:
   build_cli:
@@ -11,6 +27,7 @@ jobs:
     uses: ./.github/workflows/build.yml
 
   get_dev_version:
+    if: inputs.devRelease == 'yes'
     name: Get Dev Build Version
     runs-on: ubuntu-latest
     outputs:
@@ -36,7 +53,8 @@ jobs:
           echo "DEV_VERSION=$DEV_VERSION" >> $GITHUB_OUTPUT
         shell: bash
 
-  release_create_stencil_cli:
+  release_create_stencil_cli_dev:
+    if: inputs.devRelease == 'yes'
     name: Publish Dev Build
     needs: [build_cli, get_dev_version]
     runs-on: ubuntu-latest
@@ -50,3 +68,21 @@ jobs:
           tag: dev
           version: ${{ needs.get_dev_version.outputs.dev-version }}
           token: ${{ secrets.NPM_TOKEN }}
+
+  release_create_stencil_cli:
+    if: inputs.devRelease == 'no'
+    name: Publish Create Stencil CLI
+    needs: [build_cli]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: ./.github/workflows/actions/publish-npm
+        with:
+          tag: latest
+          version: ${{ inputs.releaseType }}
+          token: ${{ secrets.NPM_TOKEN }}
+
+  
