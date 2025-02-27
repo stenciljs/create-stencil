@@ -5,7 +5,7 @@ export default defineConfig({
     coverage: {
       enabled: true,
       provider: 'v8',
-      exclude: ['index.js', 'vitest.config.ts', 'rollup.config.mjs'],
+      exclude: ['index.js', 'vitest.config.ts', 'rollup.config.mjs', 'dist'],
       thresholds: {
         branches: 80,
         functions: 80,
