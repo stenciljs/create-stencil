@@ -22,7 +22,7 @@ General Use Flags:
   --help - show usage examples for the CLI
   --info - print the current version of the CLI
 
-Additional Information: https://github.com/ionic-team/create-stencil
+Additional Information: https://github.com/stenciljs/create-stencil
 `;
 
 async function run() {

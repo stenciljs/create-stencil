@@ -4,7 +4,7 @@
   "description": "Quickly create a new stencil component project: npm init stencil",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ionic-team/create-stencil"
+    "url": "https://github.com/stenciljs/create-stencil"
   },
   "main": "index.js",
   "files": [

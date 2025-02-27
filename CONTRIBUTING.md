@@ -4,7 +4,7 @@ Thanks for your interest in contributing to create-stencil! :tada:
 
 ## Contributing Etiquette
 
-Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stencil/blob/main/CODE_OF_CONDUCT.md) for information on our rules of conduct.
+Please see our [Contributor Code of Conduct](https://github.com/stenciljs/.github/blob/main/CODE_OF_CONDUCT.md) for information on our rules of conduct.
 
 ## Creating an Issue
 
@@ -16,9 +16,9 @@ Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stenc
 
 * Issues with no clear steps to reproduce will not be triaged. If an issue is labeled with "Awaiting Reply" and receives no further replies from the author of the issue for more than 5 days, it will be closed.
 
-* If you think you have found a bug, or have a new feature idea, please start by making sure it hasn't already been [reported](https://github.com/ionic-team/stencil/issues?utf8=%E2%9C%93&q=is%3Aissue). You can search through existing issues to see if there is a similar one reported. Include closed issues as it may have been closed with a solution.
+* If you think you have found a bug, or have a new feature idea, please start by making sure it hasn't already been [reported](https://github.com/stenciljs/core/issues?utf8=%E2%9C%93&q=is%3Aissue). You can search through existing issues to see if there is a similar one reported. Include closed issues as it may have been closed with a solution.
 
-* Next, [create a new issue](https://github.com/ionic-team/create-stencil/issues/new?assignees=&labels=&projects=&template=bug_report.yml&title=bug%3A+) that thoroughly explains the problem. Please fill out the populated issue form before submitting the issue.
+* Next, [create a new issue](https://github.com/stenciljs/create-stencil/issues/new?assignees=&labels=&projects=&template=bug_report.yml&title=bug%3A+) that thoroughly explains the problem. Please fill out the populated issue form before submitting the issue.
 
 
 ## Creating a Pull Request
@@ -46,8 +46,8 @@ npm run dev
 
 ### Commit Message Format
 
-Please see the [Commit Message Format section](https://github.com/ionic-team/stencil/blob/main/CONTRIBUTING.md#commit-message-format) of the Stencil README.
+Please see the [Commit Message Format section](https://github.com/stenciljs/core/blob/main/CONTRIBUTING.md#commit-message-format) of the Stencil README.
 
 ## License
 
-By contributing your code to the ionic-team/stencil GitHub Repository, you agree to license your contribution under the MIT license.
+By contributing your code to the [stenciljs/core](https://github.com/stenciljs/core/blob/main/CONTRIBUTING.md) GitHub Repository, you agree to license your contribution under the MIT license.

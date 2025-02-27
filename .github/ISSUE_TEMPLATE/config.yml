@@ -1,9 +1,9 @@
 contact_links:
   - name: 📚 Documentation
-    url: https://github.com/ionic-team/stencil-site/issues/new/choose
+    url: https://github.com/stenciljs/site/issues/new/choose
     about: This issue tracker is not for documentation issues. Please file documentation issues on the Stencil site repo.
   - name: 💻 Stencil
-    url: https://github.com/ionic-team/stencil/issues/new/choose
+    url: https://github.com/stenciljs/core/issues/new/choose
     about: This issue tracker is not for Stencil compiler issues. Please file compiler issues on the Stencil repo.
   - name: 🤔 Support Question
     url: https://forum.ionicframework.com/

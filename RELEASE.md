@@ -11,7 +11,7 @@ Development Releases (or "Dev Releases", "Dev Builds") are installable instances
 
 Only members of the Stencil team may create dev builds of The Create Stencil Cli.
 To publish the package:
-1. Navigate to the [Create Stencil Cli Dev Release GitHub Action](https://github.com/ionic-team/create-stencil/actions/workflows/release-dev.yml) in your browser.
+1. Navigate to the [Create Stencil Cli Dev Release GitHub Action](https://github.com/stenciljs/create-stencil/actions/workflows/release-dev.yml) in your browser.
 2. Select the 'Run Workflow' dropdown on the right hand side of the page
 3. The dropdown will ask you for a branch name to publish from. Any branch may be used here.
 4. Select 'Run Workflow'

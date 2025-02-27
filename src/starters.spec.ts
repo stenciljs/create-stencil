@@ -18,7 +18,7 @@ describe('starters', () => {
 
       expect(starterInfo).toEqual<Starter>({
         description: 'Collection of web components that can be used anywhere',
-        docs: 'https://github.com/ionic-team/stencil-component-starter',
+        docs: 'https://github.com/stenciljs/component-starter',
         name: 'component',
         repo: 'ionic-team/stencil-component-starter',
       });
