@@ -1,7 +1,7 @@
-import { get, request, type RequestOptions } from 'https';
-import * as Url from 'url';
-import { Starter } from './starters';
+import fetch, { type RequestInit } from 'node-fetch';
 import { HttpsProxyAgent } from 'https-proxy-agent';
+
+import { Starter } from './starters';
 
 /**
  * Build a URL to retrieve a starter template from a GitHub instance
@@ -33,44 +33,26 @@ export function getGitHubUrl(): string {
 }
 
 function getRequestOptions(starter: string | Starter) {
-  const url = typeof starter === 'string' ? starter : getStarterUrl(starter);
-  const options: RequestOptions = Url.parse(url);
+  const url = new URL(typeof starter === 'string' ? starter : getStarterUrl(starter));
+  const options: RequestInit = {
+    follow: Infinity
+  }
   if (process.env['https_proxy']) {
     const agent = new HttpsProxyAgent(process.env['https_proxy']);
     options.agent = agent;
   }
-  return options;
+  return { url, options };
 }
 
-export function downloadStarter(starter: Starter | string) {
-  return new Promise<Buffer>((resolve, reject) => {
-    get(getRequestOptions(starter), (res) => {
-      if (res.statusCode === 302) {
-        downloadStarter(res.headers.location!).then(resolve, reject);
-      } else {
-        const data: any[] = [];
-
-        res.on('data', (chunk) => data.push(chunk));
-        res.on('end', () => {
-          resolve(Buffer.concat(data));
-        });
-        res.on('error', reject);
-      }
-    });
-  });
+export async function downloadStarter(starter: Starter | string): Promise<ArrayBuffer> {
+  const { url, options } = getRequestOptions(starter);
+  const response = await fetch(url, options);
+  return response.arrayBuffer();
 }
 
-export function verifyStarterExists(starter: Starter | string) {
-  const options = getRequestOptions(starter);
+export async function verifyStarterExists(starter: Starter | string) {
+  const { url, options } = getRequestOptions(starter);
   options.method = 'HEAD';
-  return new Promise<boolean>((resolve) => {
-    const req = request(options, (res) => {
-      res.destroy();
-      if (res.statusCode === 404) {
-        return resolve(false);
-      }
-      return resolve(true);
-    });
-    req.end();
-  });
+  const response = await fetch(url, options);
+  return response.status === 200;
 }

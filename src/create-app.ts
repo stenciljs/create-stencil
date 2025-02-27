@@ -1,7 +1,9 @@
-import { Spinner } from 'cli-spinner';
-import fs from 'fs';
-import { join } from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
+
 import { bold, cyan, dim, green, yellow } from 'colorette';
+import { log, spinner } from '@clack/prompts';
+
 import { downloadStarter } from './download';
 import { Starter } from './starters';
 import { unZipBuffer } from './unzip';
@@ -22,9 +24,8 @@ export async function createApp(starter: Starter, projectName: string, autoRun: 
     throw new Error(`Project name "${projectName}" is not valid. It must be a kebab-case name without spaces.`);
   }
 
-  const loading = new Spinner(bold('Preparing starter'));
-  loading.setSpinnerString(18);
-  loading.start();
+  const loading = spinner();
+  loading.start(bold('Preparing starter'));
 
   const startT = Date.now();
   const moveTo = await prepareStarter(starter);
@@ -32,17 +33,17 @@ export async function createApp(starter: Starter, projectName: string, autoRun: 
     throw new Error('starter install failed');
   }
   await moveTo(projectName);
-  loading.stop(true);
+  loading.stop('Done!');
 
   const time = printDuration(Date.now() - startT);
   let didGitSucceed = initGitForStarter(projectName);
 
   if (didGitSucceed) {
-    console.log(`${green('✔')} ${bold('All setup')} ${onlyUnix('🎉')} ${dim(time)}`);
+    log.success(`${green('✔')} ${bold('All setup')} ${onlyUnix('🎉')} ${dim(time)}`);
   } else {
     // an error occurred setting up git for the project. log it, but don't block creating the project
-    console.log(`${yellow('❗')} We were unable to ensure git was configured for this project.`);
-    console.log(`${green('✔')} ${bold('However, your project was still created')} ${onlyUnix('🎉')} ${dim(time)}`);
+    log.warn(`${yellow('❗')} We were unable to ensure git was configured for this project.`);
+    log.success(`${green('✔')} ${bold('However, your project was still created')} ${onlyUnix('🎉')} ${dim(time)}`);
   }
 
   // newline here is intentional in relation to the previous logged statements
@@ -66,6 +67,9 @@ export async function createApp(starter: Starter, projectName: string, autoRun: 
 
 ${renderDocs(starter)}
 
+  🗣️  ${dim(`Join the Stencil Community on Discord: `)}
+     ${cyan('https://discord.gg/stenciljs')}
+
   Happy coding! 🎈
 `);
 
@@ -80,8 +84,7 @@ function renderDocs(starter: Starter) {
     return '';
   }
   return `
-  ${dim('Further reading:')}
-
+  📚 ${dim('Further reading:')}
    ${dim('-')} ${cyan(docs)}
    ${dim('-')} ${cyan('https://stenciljs.com/docs')}`;
 }
@@ -91,7 +94,9 @@ export function prepareStarter(starter: Starter) {
   if (!promise) {
     promise = prepare(starter);
     // silent crash, we will handle later
-    promise.catch(() => {
+    promise.catch((err: unknown) => {
+      const error = err instanceof Error ? err.message : String(err);
+      console.error(`\n\nFailed to setup starter project "${starter.name}": ${error}\n\n`);
       return;
     });
     starterCache.set(starter, promise);
@@ -101,7 +106,7 @@ export function prepareStarter(starter: Starter) {
 
 async function prepare(starter: Starter) {
   const baseDir = process.cwd();
-  const tmpPath = join(baseDir, '.tmp-stencil-starter');
+  const tmpPath = path.join(baseDir, '.tmp-stencil-starter');
   const buffer = await downloadStarter(starter);
   setTmpDirectory(tmpPath);
 
@@ -109,10 +114,10 @@ async function prepare(starter: Starter) {
   await npm('ci', tmpPath);
 
   return async (projectName: string) => {
-    const filePath = join(baseDir, projectName);
+    const filePath = path.join(baseDir, projectName);
     await fs.promises.rename(tmpPath, filePath);
     await replaceInFile({
-      files: [join(filePath, '*'), join(filePath, 'src/*')],
+      files: [path.join(filePath, '*'), path.join(filePath, 'src/*')],
       from: /stencil-starter-project-name/g,
       to: projectName,
       glob: {

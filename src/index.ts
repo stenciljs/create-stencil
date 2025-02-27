@@ -1,4 +1,5 @@
-import { red } from 'colorette';
+import { log, intro, outro } from '@clack/prompts';
+
 import { createApp } from './create-app';
 import { runInteractive } from './interactive';
 import { getStarterRepo } from './starters';
@@ -44,6 +45,7 @@ async function run() {
   }
 
   nodeVersionWarning();
+  intro('Create Stencil App 🚀');
 
   let didError = false;
   try {
@@ -61,7 +63,8 @@ async function run() {
     }
   } catch (e) {
     didError = true;
-    console.error(`\n${red('✖')} ${e instanceof Error ? e.message : e}\n`);
+    log.error(`${e instanceof Error ? e.message : e}`);
+    outro(`Bye! 👋`);
   }
   cleanup(didError);
 }

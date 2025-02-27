@@ -1,6 +1,8 @@
-import { prompt } from 'prompts';
-import { cursor, erase } from 'sisteransi';
-import { dim } from 'colorette';
+import fs from 'node:fs';
+
+import { select, isCancel, cancel, text, confirm, outro } from '@clack/prompts'
+import { dim, bold } from 'colorette';
+
 import { verifyStarterExists } from './download';
 import { createApp, prepareStarter } from './create-app';
 import { STARTERS, Starter, getStarterRepo } from './starters';
@@ -11,9 +13,6 @@ import { STARTERS, Starter, getStarterRepo } from './starters';
 const COMMUNITY_PREFIX = '[community]';
 
 export async function runInteractive(starterName: string | undefined, autoRun: boolean) {
-  process.stdout.write(erase.screen);
-  process.stdout.write(cursor.to(0, 1));
-
   // Get starter's repo
   if (!starterName) {
     starterName = await askStarterName();
@@ -36,8 +35,9 @@ export async function runInteractive(starterName: string | undefined, autoRun: b
   const confirm = await askConfirm(starter, projectName);
   if (confirm) {
     await createApp(starter, projectName, autoRun);
+    outro(`Project "${projectName}" created successfully! 🎉`);
   } else {
-    console.log('\n  aborting...');
+    outro(`Aborting!\n\nBye! 👋`);
   }
 }
 
@@ -46,31 +46,43 @@ export async function runInteractive(starterName: string | undefined, autoRun: b
  * @returns the name of the starter project to use
  */
 async function askStarterName(): Promise<string> {
-  const { starterName }: any = await prompt([
-    {
-      type: 'select',
-      name: 'starterName',
-      /**
-       * the width of this message is intentionally kept to ~80 characters. this is a slightly arbitrary decision to
-       * prevent one long single line message in wide terminal windows. this _should_ be changeable without any
-       * negative impact on the code.
-       */
-      message: `Select a starter project.
+  let starterName = await select({
+    /**
+     * the width of this message is intentionally kept to ~80 characters. this is a slightly arbitrary decision to
+     * prevent one long single line message in wide terminal windows. this _should_ be changeable without any
+     * negative impact on the code.
+     */
+    message: 'Select a starter project.',
+    options: [
+      ...getChoices(),
+      {
+        value: 'custom',
+        label: 'Type a custom starter',
+      }
+    ]
+  });
 
-Starters marked as ${COMMUNITY_PREFIX} are developed by the Stencil Community,
-rather than Ionic. For more information on the Stencil Community, please see
-https://github.com/stencil-community`,
-      choices: getChoices(),
-    },
-    {
-      type: (prev: any) => (prev === null ? 'text' : null),
-      name: 'starterName',
+  if (isCancel(starterName)) {
+    cancel('Operation cancelled.');
+    process.exit(0);
+  }
+
+  if (starterName === 'custom') {
+    starterName = await text({
       message: 'Type a custom starter',
-    },
-  ]);
+      placeholder: 'e.g. https://github.com/stencil-community/stencil-app-starter',
+    });
+  }
+
+  if (isCancel(starterName)) {
+    cancel('Operation cancelled.');
+    process.exit(0);
+  }
+
   if (!starterName) {
     throw new Error(`No starter was provided, try again.`);
   }
+
   return starterName;
 }
 
@@ -78,14 +90,15 @@ https://github.com/stencil-community`,
  * Generate a terminal-friendly list of options for the user to select from
  * @returns a formatted list of starter options
  */
-function getChoices(): ReadonlyArray<{ title: string; value: string }> {
+function getChoices(): { label: string; value: string }[] {
   const maxLength = Math.max(...STARTERS.map((s) => generateStarterName(s).length)) + 1;
   return [
     ...STARTERS.filter((s) => s.hidden !== true).map((s) => {
       const description = s.description ? dim(s.description) : '';
       return {
-        title: `${padEnd(generateStarterName(s), maxLength)}   ${description}`,
+        label: `${padEnd(generateStarterName(s), maxLength)}   ${description}`,
         value: s.name,
+        hint: s.isCommunity ? 'Community-driven starter project' : undefined,
       };
     }),
   ];
@@ -102,29 +115,40 @@ function generateStarterName(starter: Starter): string {
 }
 
 async function askProjectName() {
-  const { projectName }: any = await prompt([
-    {
-      type: 'text',
-      name: 'projectName',
-      message: 'Project name',
+  const projectName = await text({
+    message: 'Project name',
+    validate: (value) => {
+      if (!value) {
+        return 'Project name is required';
+      }
+      if (fs.existsSync(value)) {
+        return `Project "${value}" name already exists`;
+      }
     },
-  ]);
-  if (!projectName) {
-    throw new Error(`No project name was provided, try again.`);
+  });
+
+  if (isCancel(projectName)) {
+    cancel('Operation cancelled.');
+    process.exit(0);
   }
+
   return projectName;
 }
 
 async function askConfirm(starter: Starter, projectName: string) {
-  const { confirm }: any = await prompt([
-    {
-      type: 'confirm',
-      name: 'confirm',
-      message: 'Confirm?',
-      initial: true,
-    },
-  ]);
-  return confirm;
+  const ok = await confirm({
+    message: `Create ${bold(starter.name)} project with name "${projectName}"?
+    
+Confirm?`,
+    initialValue: true,
+  });
+
+  if (isCancel(ok)) {
+    cancel('Operation cancelled.');
+    process.exit(0);
+  }
+
+  return ok;
 }
 
 function padEnd(str: string, targetLength: number, padString = ' ') {

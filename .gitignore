@@ -4,3 +4,4 @@ dist
 index.js
 .DS_store
 .idea/
+*.tgz

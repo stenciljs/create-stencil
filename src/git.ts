@@ -1,5 +1,7 @@
-import { execSync } from 'child_process';
-import { green, yellow } from 'colorette';
+import { execSync } from 'node:child_process';
+
+import { log } from '@clack/prompts';
+import { green, red, yellow } from 'colorette';
 import { getPkgVersion } from './version';
 
 /**
@@ -39,10 +41,10 @@ export const inExistingGitTree = (): boolean => {
     // find a git repo)
     execSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' });
 
-    console.info(`${yellow('❗')} An existing git repo was detected, a new one will not be created`);
+    log.warn(`${yellow('❗')} An existing git repo was detected, a new one will not be created`);
     isInTree = true;
   } catch (_err: unknown) {
-    console.info(`${green('✔')} A new git repo was initialized`);
+    log.success(`${green('✔')} A new git repo was initialized`);
   }
   return isInTree;
 };
@@ -62,7 +64,8 @@ export const initGit = (): boolean => {
     execSync('git init', { stdio: 'ignore' });
     wasSuccess = true;
   } catch (err: unknown) {
-    console.error(err);
+    const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+    log.error(`${red('❌')} Failed to initialize git repository: ${errorMessage}`);
   }
 
   return wasSuccess;

@@ -1,7 +1,10 @@
-import { ChildProcess, spawn } from 'child_process';
-import fs from 'fs';
-import { join } from 'path';
+import fs from 'node:fs';
+import url from 'node:url';
+import path from 'node:path';
+import { ChildProcess, spawn } from 'node:child_process';
 import { yellow } from 'colorette';
+
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 const childrenProcesses: ChildProcess[] = [];
 let tmpDirectory: string | null = null;
@@ -50,7 +53,7 @@ export function npm(command: string, projectPath: string, stdio: any = 'ignore')
 export function rimraf(dir_path: string) {
   if (fs.existsSync(dir_path)) {
     fs.readdirSync(dir_path).forEach((entry) => {
-      const entry_path = join(dir_path, entry);
+      const entry_path = path.join(dir_path, entry);
       if (fs.lstatSync(entry_path).isDirectory()) {
         rimraf(entry_path);
       } else {
@@ -98,9 +101,9 @@ export function nodeVersionWarning() {
 }
 
 /**
- * Returns the result of attempting to `require` the project's `package.json`
- * @returns the result of a `require()` statement
+ * Returns the result of attempting to read and parse the project's `package.json`
  */
 export const getPackageJson = () => {
-  return require('./package.json');
+  const packageJsonPath = path.join(__dirname, 'package.json');
+  return JSON.parse(fs.readFileSync(packageJsonPath).toString());
 };

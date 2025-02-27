@@ -1,3 +1,4 @@
+import { describe, expect, it, afterEach } from 'vitest';
 import { Starter } from './starters';
 import { getGitHubUrl, getStarterUrl, verifyStarterExists } from './download';
 

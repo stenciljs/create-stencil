@@ -1,24 +1,43 @@
-import * as cp from 'child_process';
+import { execSync} from 'node:child_process';
+
+import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
 import { commitAllFiles, hasGit, inExistingGitTree, initGit } from './git';
-import * as Version from './version';
+import { getPkgVersion } from './version';
+
+vi.mock('node:child_process', () => ({
+  execSync: vi.fn()
+}));
+
+const MOCK_PKG_JSON_VERSION = '3.0.0';
+vi.mock('./version', () => ({
+  getPkgVersion: vi.fn().mockReturnValue('3.0.0'),
+}));
+
+vi.mock('@clack/prompts', () => ({
+  log: {
+    warn: vi.fn(),
+    success: vi.fn(),
+    error: vi.fn(),
+  },
+  intro: vi.fn(),
+  outro: vi.fn(),
+}));
 
 describe('git', () => {
-  let execSyncSpy: jest.SpyInstance<ReturnType<typeof cp.execSync>, Parameters<typeof cp.execSync>>;
-
   beforeEach(() => {
-    execSyncSpy = jest.spyOn(cp, 'execSync');
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-    jest.spyOn(console, 'info').mockImplementation(() => {});
-    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'info').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('hasGit', () => {
     it('returns true when git is on the path', () => {
-      execSyncSpy.mockImplementation((cmd: string, _options: cp.ExecOptions | undefined) => {
+      vi.mocked(execSync).mockImplementation((cmd: string, _options: unknown | undefined) => {
+        console.log('cmd', cmd);
         switch (cmd) {
           case 'git --version':
             return Buffer.alloc(0);
@@ -31,7 +50,7 @@ describe('git', () => {
     });
 
     it('returns false when git is not on the path', () => {
-      execSyncSpy.mockImplementation((cmd: string, _options: cp.ExecOptions | undefined) => {
+      vi.mocked(execSync).mockImplementation((cmd: string, _options: unknown | undefined) => {
         switch (cmd) {
           case 'git --version':
             throw new Error('`git` could not be found');
@@ -46,7 +65,7 @@ describe('git', () => {
 
   describe('inExistingGitTree', () => {
     it('returns status of true when a project is in existing git repo', () => {
-      execSyncSpy.mockImplementation((cmd: string, _options: cp.ExecOptions | undefined) => {
+      vi.mocked(execSync).mockImplementation((cmd: string, _options: unknown | undefined) => {
         switch (cmd) {
           case 'git rev-parse --is-inside-work-tree':
             return Buffer.alloc(0);
@@ -59,7 +78,7 @@ describe('git', () => {
     });
 
     it('returns status of false when a project is not in existing git repo', () => {
-      execSyncSpy.mockImplementation(() => {
+      vi.mocked(execSync).mockImplementation(() => {
         throw new Error('fatal: not a git repository (or any of the parent directories): .git');
       });
       expect(inExistingGitTree()).toBe(false);
@@ -68,7 +87,7 @@ describe('git', () => {
 
   describe('initGit', () => {
     it('returns true when git is successfully initialized', () => {
-      execSyncSpy.mockImplementation((cmd: string, _options: cp.ExecOptions | undefined) => {
+      vi.mocked(execSync).mockImplementation((cmd: string, _options: unknown | undefined) => {
         switch (cmd) {
           case 'git init':
             return Buffer.alloc(0);
@@ -80,7 +99,7 @@ describe('git', () => {
     });
 
     it('returns false when git repo initialization fails', () => {
-      execSyncSpy.mockImplementation((cmd: string, _options: cp.ExecOptions | undefined) => {
+      vi.mocked(execSync).mockImplementation((cmd: string, _options: unknown | undefined) => {
         switch (cmd) {
           case 'git init':
             throw new Error('`git init` failed for some reason');
@@ -93,17 +112,8 @@ describe('git', () => {
   });
 
   describe('commitGit', () => {
-    const MOCK_PKG_JSON_VERSION = '3.0.0';
-    let getPkgVersionSpy: jest.SpyInstance<
-      ReturnType<typeof Version.getPkgVersion>,
-      Parameters<typeof Version.getPkgVersion>
-    >;
-
     beforeEach(() => {
-      getPkgVersionSpy = jest.spyOn(Version, 'getPkgVersion');
-      getPkgVersionSpy.mockImplementation(() => MOCK_PKG_JSON_VERSION);
-
-      execSyncSpy.mockImplementation((cmd: string, _options: cp.ExecOptions | undefined) => {
+      vi.mocked(execSync).mockImplementation((cmd: string, _options: unknown | undefined) => {
         switch (cmd) {
           case 'git add -A':
             return Buffer.alloc(0);
@@ -116,17 +126,14 @@ describe('git', () => {
       });
     });
 
-    afterEach(() => {
-      getPkgVersionSpy.mockRestore();
-    });
-
     it('returns true when files are committed', () => {
+      vi.mocked(getPkgVersion).mockReturnValue('3.0.0');
       expect(commitAllFiles()).toBe(true);
     });
 
     describe("'git add' fails", () => {
       beforeEach(() => {
-        execSyncSpy.mockImplementation((cmd: string, _options: cp.ExecOptions | undefined) => {
+        vi.mocked(execSync).mockImplementation((cmd: string, _options: unknown | undefined) => {
           switch (cmd) {
             case 'git add -A':
               throw new Error('git add has failed for some reason');
@@ -145,14 +152,14 @@ describe('git', () => {
       it('does not attempt to commit files', () => {
         commitAllFiles();
 
-        expect(execSyncSpy).toHaveBeenCalledTimes(1);
-        expect(execSyncSpy).toHaveBeenCalledWith('git add -A', { stdio: 'ignore' });
+        expect(vi.mocked(execSync)).toHaveBeenCalledTimes(1);
+        expect(vi.mocked(execSync)).toHaveBeenCalledWith('git add -A', { stdio: 'ignore' });
       });
     });
 
     describe("'git commit' fails", () => {
       it("returns false when 'git commit' fails", () => {
-        execSyncSpy.mockImplementation((cmd: string, _options: cp.ExecOptions | undefined) => {
+        vi.mocked(execSync).mockImplementation((cmd: string, _options: unknown | undefined) => {
           switch (cmd) {
             case 'git add -A':
               return Buffer.alloc(0);

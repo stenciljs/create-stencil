@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import { fromBuffer } from 'yauzl';
+import * as yauzl from 'yauzl';
 
-export function unZipBuffer(buffer: Buffer, projectName: string) {
+export function unZipBuffer(buffer: ArrayBuffer, projectName: string) {
   return new Promise((resolve, reject) => {
-    fromBuffer(buffer, { lazyEntries: true }, handleZipFile(projectName, resolve, reject));
+    yauzl.fromBuffer(Buffer.from(buffer), { lazyEntries: true }, handleZipFile(projectName, resolve, reject));
   });
 }
 

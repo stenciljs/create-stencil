@@ -7,7 +7,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noEmitOnError": false,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -15,7 +15,7 @@
     "outDir": "dist/src",
     "sourceMap": false,
     "strict": true,
-    "target": "es2017",
+    "target": "es2022",
     "useUnknownInCatchVariables": true
   },
   "files": ["src/index.ts"]

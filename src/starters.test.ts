@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getStarterRepo, Starter } from './starters';
 
 describe('starters', () => {
