@@ -1,11 +1,11 @@
-import { execSync} from 'node:child_process';
+import { execSync } from 'node:child_process';
 
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
 import { commitAllFiles, hasGit, inExistingGitTree, initGit } from './git';
 import { getPkgVersion } from './version';
 
 vi.mock('node:child_process', () => ({
-  execSync: vi.fn()
+  execSync: vi.fn(),
 }));
 
 const MOCK_PKG_JSON_VERSION = '3.0.0';

@@ -4,7 +4,7 @@ import { getPkgVersion } from './version';
 import { getPackageJson } from './utils';
 
 vi.mock('./utils', () => ({
-  getPackageJson: vi.fn()
+  getPackageJson: vi.fn(),
 }));
 
 describe('version', () => {

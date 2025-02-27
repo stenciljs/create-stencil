@@ -35,8 +35,8 @@ export function getGitHubUrl(): string {
 function getRequestOptions(starter: string | Starter) {
   const url = new URL(typeof starter === 'string' ? starter : getStarterUrl(starter));
   const options: RequestInit = {
-    follow: Infinity
-  }
+    follow: Infinity,
+  };
   if (process.env['https_proxy']) {
     const agent = new HttpsProxyAgent(process.env['https_proxy']);
     options.agent = agent;

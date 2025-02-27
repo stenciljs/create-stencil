@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-import { select, isCancel, cancel, text, confirm, outro } from '@clack/prompts'
+import { select, isCancel, cancel, text, confirm, outro } from '@clack/prompts';
 import { dim, bold } from 'colorette';
 
 import { verifyStarterExists } from './download';
@@ -58,8 +58,8 @@ async function askStarterName(): Promise<string> {
       {
         value: 'custom',
         label: 'Type a custom starter',
-      }
-    ]
+      },
+    ],
   });
 
   if (isCancel(starterName)) {
