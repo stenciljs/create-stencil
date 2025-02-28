@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Get Core Dependencies
-        uses: ./.github/workflows/actions/get-core-dependencies
+        uses: stenciljs/.github/actions/get-core-dependencies@main
 
       - name: Use Node ${{ matrix.node }}
         uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
@@ -28,7 +28,7 @@ jobs:
           cache: 'npm'
       
       - name: Download Build Archive
-        uses: ./.github/workflows/actions/download-archive
+        uses: stenciljs/.github/actions/download-archive@main
         with:
           name: stencil-cli
           path: .
