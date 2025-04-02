@@ -68,7 +68,7 @@ export async function createApp(starter: Starter, projectName: string, autoRun: 
 ${renderDocs(starter)}
 
   🗣️  ${dim(`Join the Stencil Community on Discord: `)}
-     ${cyan('https://discord.gg/stenciljs')}
+     ${cyan('https://chat.stenciljs.com')}
 
   Happy coding! 🎈
 `);
