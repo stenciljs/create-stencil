@@ -1,6 +1,6 @@
 {
   "name": "create-stencil",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Quickly create a new stencil component project: npm init stencil",
   "repository": {
     "type": "git",
