@@ -16,7 +16,7 @@ describe('download', () => {
     it('returns true if starter does exist', async () => {
       expect(
         await verifyStarterExists({
-          repo: 'ionic-team/stencil',
+          repo: 'stenciljs/core',
           name: 'stencil',
         }),
       ).toBe(true);

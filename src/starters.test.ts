@@ -21,7 +21,7 @@ describe('starters', () => {
         description: 'Collection of web components that can be used anywhere',
         docs: 'https://github.com/stenciljs/component-starter',
         name: 'component',
-        repo: 'ionic-team/stencil-component-starter',
+        repo: 'stenciljs/component-starter',
       });
     });
 
