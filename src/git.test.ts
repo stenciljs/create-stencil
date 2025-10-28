@@ -25,6 +25,7 @@ vi.mock('@clack/prompts', () => ({
 
 describe('git', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.spyOn(console, 'info').mockImplementation(() => {});
     vi.spyOn(console, 'warn').mockImplementation(() => {});
