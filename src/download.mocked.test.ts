@@ -76,5 +76,3 @@ describe('download (mocked)', () => {
     expect(passedUrl.toString()).toBe(url);
   });
 });
-
-
