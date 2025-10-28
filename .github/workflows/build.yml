@@ -21,15 +21,21 @@ jobs:
       - name: 🕸️ Get Core Dependencies
         uses: stenciljs/.github/actions/get-core-dependencies@main
 
-      - name: 📦 Install (resolve optional native deps)
-        run: npm install --no-audit --no-fund
+      - name: 🟩 Setup Node 20.15.1
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.15.1
+          cache: 'npm'
+
+      - name: 📦 Clean install on Linux (resolve native optional deps)
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install --no-audit --no-fund
         shell: bash
 
       - name: 🏗️ CLI Build
         run: npm run build
         shell: bash
-        env:
-          ROLLUP_SKIP_NODEJS_NATIVE: 'true'
 
       - name: 🧪 Unit Tests
         run: npm test
