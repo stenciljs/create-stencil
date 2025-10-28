@@ -110,6 +110,18 @@ describe('git', () => {
       });
       expect(initGit()).toBe(false);
     });
+
+    it('returns false when git init throws non-Error exception', () => {
+      vi.mocked(execSync).mockImplementation((cmd: string, _options: unknown | undefined) => {
+        switch (cmd) {
+          case 'git init':
+            throw 'string error message'; // Non-Error exception
+          default:
+            throw new Error(`unmocked command ${cmd}`);
+        }
+      });
+      expect(initGit()).toBe(false);
+    });
   });
 
   describe('commitGit', () => {
@@ -129,6 +141,13 @@ describe('git', () => {
 
     it('returns true when files are committed', () => {
       vi.mocked(getPkgVersion).mockReturnValue('3.0.0');
+      expect(commitAllFiles()).toBe(true);
+    });
+
+    it('returns true when files are committed even if version retrieval fails', () => {
+      vi.mocked(getPkgVersion).mockImplementation(() => {
+        throw new Error('Could not determine version');
+      });
       expect(commitAllFiles()).toBe(true);
     });
 
