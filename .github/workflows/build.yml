@@ -28,6 +28,8 @@ jobs:
       - name: 🏗️ CLI Build
         run: npm run build
         shell: bash
+        env:
+          ROLLUP_SKIP_NODEJS_NATIVE: 'true'
 
       - name: 🧪 Unit Tests
         run: npm test
