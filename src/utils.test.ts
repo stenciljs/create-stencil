@@ -7,6 +7,7 @@ import {
   cleanup,
   npm,
   rimraf,
+  killChildren,
   onlyUnix,
   printDuration,
   isWin,
@@ -14,6 +15,7 @@ import {
   nodeVersionWarning,
   getPackageJson,
 } from './utils';
+import * as utils from './utils';
 
 // Mock the fs module
 vi.mock('node:fs', () => ({
@@ -47,6 +49,49 @@ describe('utils', () => {
       setTmpDirectory('/tmp/test');
       expect(processOn).toHaveBeenCalledTimes(4);
     });
+
+    it('should not register cleanup handlers when set to null', () => {
+      const processOn = vi.spyOn(process, 'once');
+      setTmpDirectory(null);
+      expect(processOn).not.toHaveBeenCalled();
+    });
+
+    it('registered handlers should trigger cleanup with appropriate exit codes', () => {
+      const processOn = vi.spyOn(process, 'once');
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+      vi.useFakeTimers();
+
+      setTmpDirectory('/tmp/test');
+
+      // collect callbacks registered via process.once
+      const calls = (processOn as unknown as { mock: { calls: [string, (...args: any[]) => void][] } }).mock.calls;
+      expect(calls.length).toBe(4);
+
+      const cbMap = new Map<string, (...args: any[]) => void>(calls);
+
+      // uncaughtException should exit with code 1
+      cbMap.get('uncaughtException')?.(new Error('boom'));
+      vi.runAllTimers();
+      expect(exitSpy).toHaveBeenLastCalledWith(1);
+
+      // exit should exit with code 0
+      exitSpy.mockClear();
+      cbMap.get('exit')?.();
+      vi.runAllTimers();
+      expect(exitSpy).toHaveBeenLastCalledWith(0);
+
+      // SIGINT should exit with code 0
+      exitSpy.mockClear();
+      cbMap.get('SIGINT')?.();
+      vi.runAllTimers();
+      expect(exitSpy).toHaveBeenLastCalledWith(0);
+
+      // SIGTERM should exit with code 0
+      exitSpy.mockClear();
+      cbMap.get('SIGTERM')?.();
+      vi.runAllTimers();
+      expect(exitSpy).toHaveBeenLastCalledWith(0);
+    });
   });
 
   describe('cleanup', () => {
@@ -68,6 +113,17 @@ describe('utils', () => {
       vi.runAllTimers();
 
       expect(exitSpy).toHaveBeenCalledWith(1);
+    });
+
+    it('exits cleanly when tmpDirectory is set', () => {
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+      vi.useFakeTimers();
+
+      setTmpDirectory('/tmp/cover');
+      cleanup(false);
+      vi.runAllTimers();
+
+      expect(exitSpy).toHaveBeenCalledWith(0);
     });
   });
 
@@ -96,6 +152,30 @@ describe('utils', () => {
     });
   });
 
+  describe('killChildren', () => {
+    it('should send SIGINT to all tracked child processes', async () => {
+      // reset module state so childrenProcesses is empty for this test
+      await vi.resetModules();
+
+      const { npm: freshNpm, killChildren: freshKillChildren } = await import('./utils');
+
+      const mockSpawn = vi.mocked(spawn);
+      const mockProcess: any = {
+        once: vi.fn().mockImplementation((event, cb) => {
+          if (event === 'exit') cb();
+          return mockProcess;
+        }),
+        kill: vi.fn(),
+      };
+      mockSpawn.mockReturnValue(mockProcess);
+
+      await freshNpm('install', '/tmp/project');
+      freshKillChildren();
+
+      expect(mockProcess.kill).toHaveBeenCalledWith('SIGINT');
+    });
+  });
+
   describe('rimraf', () => {
     it('should remove directory recursively', () => {
       vi.mocked(fs.existsSync).mockReturnValue(true);
@@ -117,12 +197,12 @@ describe('utils', () => {
   });
 
   describe('onlyUnix', () => {
-    it('should return empty string on Windows', () => {
+    it('should return string on Windows', () => {
       vi.spyOn(process, 'platform', 'get').mockReturnValue('win32');
       expect(onlyUnix('test')).toBe('test');
     });
 
-    it('should return string on Unix', () => {
+    it('should return empty string on Unix', () => {
       vi.spyOn(process, 'platform', 'get').mockReturnValue('darwin');
       expect(onlyUnix('test')).toBe('');
     });
@@ -175,6 +255,30 @@ describe('utils', () => {
       vi.spyOn(process, 'version', 'get').mockReturnValue('v10.0.0');
       nodeVersionWarning();
       expect(consoleSpy).not.toHaveBeenCalled();
+    });
+
+    it('should handle undefined version part gracefully', () => {
+      vi.spyOn(process, 'version', 'get').mockReturnValue('v');
+      expect(() => nodeVersionWarning()).not.toThrow();
+    });
+
+    it('should handle exceptions during version parsing', () => {
+      vi.spyOn(process, 'version', 'get').mockImplementation(() => {
+        throw new Error('version error');
+      });
+      expect(() => nodeVersionWarning()).not.toThrow();
+    });
+
+    it("uses fallback '0' when version parts array is empty", () => {
+      // Return a mock object that behaves like a string only for methods we use
+      vi.spyOn(process, 'version', 'get').mockReturnValue({
+        replace: () => ({
+          split: () => [], // ensures v[0] is undefined -> fallback '0'
+        }),
+      } as unknown as string);
+
+      nodeVersionWarning();
+      expect(consoleSpy).toHaveBeenCalled();
     });
   });
 
