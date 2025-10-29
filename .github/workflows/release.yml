@@ -23,6 +23,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   build_cli:
@@ -67,11 +68,11 @@ jobs:
     steps:
       - name: 📥 Checkout Code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - uses: stenciljs/.github/actions/publish-npm@main
+      - name: 📦 Publish Dev Build
+        uses: stenciljs/.github/actions/publish-npm@main
         with:
           tag: dev
           version: ${{ needs.get_dev_version.outputs.dev-version }}
-          token: ${{ secrets.NPM_TOKEN }}
 
   release_create_stencil_cli:
     if: inputs.devRelease == 'no'
@@ -80,15 +81,16 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
+      contents: write
     steps:
       - name: 📥 Checkout Code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - uses: stenciljs/.github/actions/publish-npm@main
+      - name: 📦 Publish Release
+        uses: stenciljs/.github/actions/publish-npm@main
         with:
           tag: latest
           version: ${{ inputs.releaseType }}
-          token: ${{ secrets.NPM_TOKEN }}
-          github-token: ${{ secrets.GH_ADMIN_PAT }}
+          github-token: ${{ github.token }}
 
   
