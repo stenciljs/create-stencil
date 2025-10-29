@@ -69,7 +69,7 @@ jobs:
       - name: 📥 Checkout Code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: 📦 Publish Dev Build
-        uses: stenciljs/.github/actions/publish-npm@main
+        uses: stenciljs/.github/actions/publish-npm@e9945bdf51e97eee158513427ecf7be3d3a80443 # temp fix for trusted publishers
         with:
           tag: dev
           version: ${{ needs.get_dev_version.outputs.dev-version }}
