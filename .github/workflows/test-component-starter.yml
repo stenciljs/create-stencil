@@ -15,40 +15,40 @@ jobs:
         os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout Code
+      - name: 📥 Checkout Code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Get Core Dependencies
+      - name: 🕸️ Get Core Dependencies
         uses: stenciljs/.github/actions/get-core-dependencies@main
 
-      - name: Use Node ${{ matrix.node }}
+      - name: 🟢 Use Node ${{ matrix.node }}
         uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
         with:
           node-version: ${{ matrix.node }}
           cache: 'npm'
       
-      - name: Download Build Archive
+      - name: 📥 Download Build Archive
         uses: stenciljs/.github/actions/download-archive@main
         with:
           name: stencil-cli
           path: .
           filename: stencil-cli-build.zip
 
-      - name: Initialize the Project
+      - name: 🔃 Initialize the Project
         run: node index.js component tmp-component-starter
         shell: bash
 
-      - name: Install Component Starter Dependencies
+      - name: 📦 Install Component Starter Dependencies
         run: npm install
         working-directory: ./tmp-component-starter
         shell: bash
 
-      - name: Build Starter Project
+      - name: 🏗️ Build Starter Project
         run: npm run build
         working-directory: ./tmp-component-starter
         shell: bash
 
-      - name: Test Starter Project
+      - name: 🧪 Test Starter Project
         run: npm run test -- --no-build # the project was just built, don't build it again
         working-directory: ./tmp-component-starter
         shell: bash
