@@ -25,3 +25,4 @@ jobs:
     name: Smoke Testing
     needs: [build_cli]
     uses: ./.github/workflows/test-component-starter.yml
+
