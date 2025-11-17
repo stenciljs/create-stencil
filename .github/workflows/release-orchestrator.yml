@@ -1,4 +1,4 @@
-name: 'Create Stencil Release'
+name: 'Release - Create Stencil'
 
 on:
   workflow_dispatch:
