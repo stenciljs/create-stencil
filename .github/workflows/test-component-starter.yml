@@ -52,3 +52,4 @@ jobs:
         run: npm run test -- --no-build # the project was just built, don't build it again
         working-directory: ./tmp-component-starter
         shell: bash
+
