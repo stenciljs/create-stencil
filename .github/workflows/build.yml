@@ -22,7 +22,7 @@ jobs:
         uses: stenciljs/.github/actions/get-core-dependencies@main
 
       - name: 🟩 Setup Node 20.15.1
-        uses: actions/setup-node@v6.1.0
+        uses: actions/setup-node@v6.2.0
         with:
           node-version: 20.15.1
           cache: 'npm'
