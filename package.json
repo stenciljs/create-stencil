@@ -50,7 +50,7 @@
     "np": "^10.2.0",
     "npm-run-all2": "^8.0.1",
     "onchange": "^7.1.0",
-    "prettier": "3.8.0",
+    "prettier": "3.8.1",
     "replace-in-file": "^8.3.0",
     "rimraf": "^6.0.1",
     "rollup": "^4.40.2",
