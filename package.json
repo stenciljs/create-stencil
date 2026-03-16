@@ -45,7 +45,7 @@
     "@types/yauzl": "^2.10.3",
     "@vitest/coverage-v8": "^4.0.4",
     "colorette": "^2.0.20",
-    "https-proxy-agent": "^7.0.6",
+    "https-proxy-agent": "^8.0.0",
     "node-fetch": "^3.3.2",
     "np": "^11.0.1",
     "npm-run-all2": "^8.0.1",
