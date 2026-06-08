@@ -42,7 +42,7 @@
     "@rollup/plugin-typescript": "^12.1.2",
     "@types/node": "^25.0.9",
     "@types/prompts": "^2.4.9",
-    "@types/yauzl": "^2.10.3",
+    "@types/yauzl": "^3.3.0",
     "@vitest/coverage-v8": "^4.0.4",
     "colorette": "^2.0.20",
     "https-proxy-agent": "^7.0.6",
