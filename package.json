@@ -1,6 +1,6 @@
 {
   "name": "create-stencil",
-  "version": "4.0.2",
+  "version": "5.0.0-alpha.0",
   "description": "Quickly create a new stencil component project: npm init stencil",
   "repository": {
     "type": "git",
@@ -40,7 +40,7 @@
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-typescript": "^12.1.2",
-    "@types/node": "^25.0.9",
+    "@types/node": "^25.9.5",
     "@types/prompts": "^2.4.9",
     "@types/yauzl": "^2.10.3",
     "@vitest/coverage-v8": "^4.0.4",
