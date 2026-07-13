@@ -48,6 +48,11 @@ jobs:
         working-directory: ./tmp-component-starter
         shell: bash
 
+      - name: 🎭 Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+        working-directory: ./tmp-component-starter
+        shell: bash
+
       - name: 🧪 Test Starter Project
         run: npm run test -- --no-build # the project was just built, don't build it again
         working-directory: ./tmp-component-starter
